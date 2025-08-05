@@ -19,7 +19,7 @@ if uploaded_file is not None:
             parts = log.strip().split(" ", 1)
             if len(parts) < 2:
                 continue  # Skip malformed lines
-            level = parts[0]
+            level = parts[0].upper()
             message = parts[1]
             data.append([level, message])
 
@@ -45,11 +45,27 @@ if uploaded_file is not None:
                 df["anomaly"] = model.fit_predict(df[["level_score", "message_length"]])
                 df["is_anomaly"] = df["anomaly"].apply(lambda x: "❌ Anomaly" if x == -1 else "✅ Normal")
 
-                # Show results
+                # Show all logs
                 st.subheader("📄 All Logs with Anomaly Labels")
                 st.dataframe(df)
 
+                # Filter anomalies
+                anomaly_df = df[df["is_anomaly"] == "❌ Anomaly"]
+
                 st.subheader("🚨 Detected Anomalies")
-                st.dataframe(df[df["is_anomaly"] == "❌ Anomaly"])
+
+                if not anomaly_df.empty:
+                    filter_options = anomaly_df["level"].unique().tolist()
+                    filter_options.sort()
+                    selected_level = st.selectbox("🔎 Filter by Log Level", ["All"] + filter_options)
+
+                    if selected_level != "All":
+                        filtered_df = anomaly_df[anomaly_df["level"] == selected_level]
+                    else:
+                        filtered_df = anomaly_df
+
+                    st.dataframe(filtered_df)
+                else:
+                    st.info("✅ No anomalies detected.")
     except Exception as e:
         st.error(f"❌ Error processing the file: {e}")
