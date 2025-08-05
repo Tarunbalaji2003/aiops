@@ -4,7 +4,7 @@ from sklearn.ensemble import IsolationForest
 
 st.set_page_config(page_title="Log Anomaly Detector", layout="wide")
 st.title("🔍 Log Anomaly Detector")
-st.write("Upload a `.txt` log file with format: `<LEVEL> <MESSAGE>` (no timestamp).")
+st.write("Upload a `.txt` log file with format: `<LEVEL> <MESSAGE>` ")
 
 uploaded_file = st.file_uploader("Choose a log file", type="txt")
 
